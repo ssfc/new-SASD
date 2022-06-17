@@ -1,1 +1,0 @@
-python3 train.py --sgpu 0 --lr 0.1 --epoch 200 --model cifarresnet18 --decay 5e-4 --dataset cifar100 --dataroot ../data --lamda 1
