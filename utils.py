@@ -15,6 +15,7 @@ import torch.nn.init as init
 
 from torch import optim 
 
+
 def str2bool(v):
     if v.lower() in ('true', 'yes', 't', 'y', '1'):
         return True
@@ -22,6 +23,7 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected')
+
 
 def set_logging_defaults(logdir, args):
     if os.path.isdir(logdir):
@@ -48,6 +50,7 @@ term_width = int(term_width)
 TOTAL_BAR_LENGTH = 86.
 last_time = time.time()
 begin_time = last_time
+
 
 def progress_bar(current, total, msg=None):
     global last_time, begin_time
@@ -91,7 +94,8 @@ def progress_bar(current, total, msg=None):
     else:
         sys.stdout.write('\n')
     sys.stdout.flush()
-    
+
+
 def format_time(seconds):
     days = int(seconds / 3600/24)
     seconds = seconds - days*3600*24
@@ -125,6 +129,7 @@ def format_time(seconds):
         f = '0ms'
     return f
 
+
 def adjust_learning_rate(optimizer, epoch, args):
     """Sets the learning rate to the initial LR decayed by schedule"""
     if epoch in args.schedule:
@@ -132,7 +137,8 @@ def adjust_learning_rate(optimizer, epoch, args):
         logging.info('Adjust learning rate at Epoch: {}  lr to: {:.3f}'.format(epoch, args.lr))
         for param_group in optimizer.param_groups:
             param_group['lr'] = args.lr
-            
+
+
 def lr_scheduler(optimizer, scheduler, schedule, lr_decay, total_epoch):
     optimizer.zero_grad()
     optimizer.step()
@@ -142,6 +148,7 @@ def lr_scheduler(optimizer, scheduler, schedule, lr_decay, total_epoch):
         return optim.lr_scheduler.CosineAnnealingLR(optimizer, total_epoch)
     else:
         raise NotImplementedError('{} learning rate is not implemented')
+
 
 class AverageMeter(object):
     def __init__(self):
@@ -158,10 +165,10 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-        
+
+
 def count_parameters_in_MB(model):
     return sum(np.prod(v.size()) for name, v in model.named_parameters())/1e6
-
 
         
 def accuracy(output, target, topk=(1,)):
@@ -178,3 +185,4 @@ def accuracy(output, target, topk=(1,)):
         correct_k = correct[:k].contiguous().view(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
+
