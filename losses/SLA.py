@@ -14,8 +14,8 @@ class SemCKDLoss(nn.Module):
         self.criterion_kl = DistillKL(args.temp)
         self.criterion_fl = FTLoss()
         self.crit = nn.MSELoss(reduction='none')
-        self.loss_coefficient = args.loss_coefficient
-        self.feature_loss_coefficient = args.feature_loss_coefficient
+        self.alpha = args.alpha
+
         
     def forward(self, s_value, f_target, weight):
         bsz, num_stu = weight.shape
@@ -26,6 +26,6 @@ class SemCKDLoss(nn.Module):
             ind_loss_kd[:, i] = self.criterion_kl(s_value[i], f_target).reshape(bsz,-1).mean(-1)
             ind_loss_fl[:, i] = self.criterion_fl(s_value[i], f_target).reshape(bsz,-1).mean(-1)
             
-        loss_kd = (weight * ind_loss_kd).sum()/(1.0*bsz)
-        loss_fl = (weight * ind_loss_fl).sum()/(1.0*bsz)
-        return self.loss_coefficient * loss_kd + self.feature_loss_coefficient * loss_fl
+        loss_kd = (weight * ind_loss_kd).sum()
+        loss_fl = (weight * ind_loss_fl).sum()
+        return loss_kd + self.alpha * loss_fl

@@ -26,10 +26,12 @@ class SelfAttention(nn.Module):
             #proj_value_stu.append          
             s_H, t_H = f_s[i].shape[2], f_t.shape[2]
             if s_H > t_H:
-                source = F.adaptive_avg_pool2d(f_s[i], (t_H, t_H))
+                f_s[i] = F.adaptive_avg_pool2d(f_s[i], (t_H, t_H))
+                source = f_s[i]
                 target = f_t
             elif s_H < t_H or s_H == t_H:
-                target = F.adaptive_avg_pool2d(f_t, (s_H, s_H))
+                f_t = F.adaptive_avg_pool2d(f_t, (s_H, s_H))
+                target = f_t
                 source = f_s[i]
             proj_value_stu.append(getattr(self, 'regressor'+str(i))(source))
         value_tea = target
@@ -37,28 +39,29 @@ class SelfAttention(nn.Module):
         bsz, ch = f_t.shape[0], f_t.shape[1]
         for i in range(self.s_len):
             f_s[i] = getattr(self, 'key_weight'+str(i))(f_s[i])
-            f_s[i] = f_s[i].view(bsz, ch, -1)
-        f_t = f_t.view(bsz, ch, -1)
-        emd_t = torch.bmm(f_t, f_t.permute(0,2,1))
-        emd_t = torch.nn.functional.normalize(emd_t, dim = 2)
-        emd_t  = emd_t.view(bsz, -1)
-        emd_t = self.linear(emd_t)
-        emd_s = list(range(self.s_len))
+            f_s[i] = f_s[i].view(bsz, -1)
+        f_t = f_t.view(bsz, -1)
+        #emd_t = torch.bmm(f_t, f_t.permute(0,2,1))
+        #emd_t = torch.nn.functional.normalize(emd_t, dim = 2)
+        #emd_t  = emd_t.view(bsz, -1)
+        #emd_t = self.linear(emd_t)
+        #emd_s = list(range(self.s_len))
+        '''
         for i in range(self.s_len):
             emd_s[i] = torch.bmm(f_s[i], f_s[i].permute(0,2,1))
             emd_s[i] = torch.nn.functional.normalize(emd_s[i],dim=2)
             emd_s[i] = emd_s[i].view(bsz, -1)
             emd_s[i] = self.linear(emd_s[i])
-        
+        '''
         # query of target layers
-        proj_query = emd_t
+        proj_query = f_t
         proj_query = proj_query[:, None, :]
         
         # key of source layers   
-        proj_key = emd_s[0]
+        proj_key = f_s[0]
         proj_key = proj_key[:, :, None]
-        for i in range(1, len(emd_s)):
-            temp_proj_key = emd_s[i]
+        for i in range(1, len(f_s)):
+            temp_proj_key = f_s[i]
             proj_key = torch.cat([proj_key, temp_proj_key[:, :, None]], 2)
             
         
