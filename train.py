@@ -43,10 +43,10 @@ parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate
 parser.add_argument('--ngpu', default=1, type=int, help='number of gpu')
 parser.add_argument('--sgpu', default=0, type=int, help='gpu index (start)')
 parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
-parser.add_argument('--lamda', default=2.0, type=float, help='cls loss weight ratio')
+parser.add_argument('--lamda', default=3.0, type=float, help='cls loss weight ratio')
 parser.add_argument('--decay', type=float, default=5e-4, help='weight decay')
 # distill arguments
-parser.add_argument('--temp', '-T', type=float, default=3.0)
+parser.add_argument('--temp', '-T', type=float, default=4.0)
 parser.add_argument('--feat_dim', default=128, type=int, help='feature dimension')
 
 args = parser.parse_args()
