@@ -9,7 +9,7 @@ from .KD import DistillKL
 
 
 class SemCKDLoss(nn.Module):
-    """Cross-Layer Distillation with Semantic Calibration, AAAI2021"""
+    """Cross-Layer Distillation with Semantic Calibration, AAAI 2021"""
 
     def __init__(self, args):
         super(SemCKDLoss, self).__init__()
