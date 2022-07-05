@@ -73,27 +73,27 @@ transform_test = transforms.Compose([
 ])
 
 if args.dataset == "cifar100":
-    trainset = torchvision.datasets.CIFAR100(
+    train_set = torchvision.datasets.CIFAR100(
         root=args.dataroot,
         train=True,
         download=True,
         transform=transform_train
     )
-    testset = torchvision.datasets.CIFAR100(
+    test_set = torchvision.datasets.CIFAR100(
         root=args.dataroot,
         train=False,
         download=True,
         transform=transform_test
     )
 
-trainloader = torch.utils.data.DataLoader(
-    trainset,
+train_loader = torch.utils.data.DataLoader(
+    train_set,
     batch_size=args.batch_size,
     shuffle=True,
     num_workers=4
 )
-testloader = torch.utils.data.DataLoader(
-    testset,
+test_loader = torch.utils.data.DataLoader(
+    test_set,
     batch_size=args.batch_size,
     shuffle=False,
     num_workers=4
@@ -174,7 +174,7 @@ def train(epoch, module_list):
     train_kd_loss = 0
 
     end = time.time()
-    for batch_idx, (inputs, labels) in enumerate(trainloader):
+    for batch_idx, (inputs, labels) in enumerate(train_loader):
         if use_cuda:
             inputs, labels = inputs.cuda(), labels.cuda()
         feat, outputs = model(inputs)
@@ -204,7 +204,7 @@ def train(epoch, module_list):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        progress_bar(batch_idx, len(trainloader),
+        progress_bar(batch_idx, len(train_loader),
                      'Loss: %.3f | Acc: %.3f%% (%d/%d) | KD: %.3f '
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total,
                         train_kd_loss / (batch_idx + 1)))
@@ -227,7 +227,7 @@ def test(epoch, module_list):
     total = 0.0
 
     # Define a data loader for evaluating
-    loader = testloader
+    loader = test_loader
 
     with torch.no_grad():
         for batch_idx, (inputs, labels) in enumerate(loader):
